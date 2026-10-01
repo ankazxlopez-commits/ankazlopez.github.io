@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>J.A.R.V.I.S.</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+--cyan:#00eaff;
+--blue:#008cff;
+--green:#00ffae;
+--red:#ff315d;
+--dark:#01070c;
+}
+
+html,body{
+width:100%;
+height:100%;
+}
+
+body{
+overflow:hidden;
+background:
+radial-gradient(circle at center,rgba(0,100,255,.18),transparent 40%),
+radial-gradient(circle at 50% 50%,rgba(0,234,255,.05),transparent 70%),
+#01070c;
+color:#dffcff;
+font-family:"Rajdhani",sans-serif;
+}
+
+body:before{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+background:
+linear-gradient(rgba(0,234,255,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,234,255,.025) 1px,transparent 1px);
+background-size:45px 45px;
+}
+
+.hidden{display:none!important}
+
+.auth{
+position:fixed;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle at center,rgba(0,140,255,.2),#01060b 70%);
+z-index:100;
+}
+
+.auth-box{
+position:relative;
+width:min(440px,92vw);
+padding:45px;
+background:linear-gradient(145deg,rgba(2,20,32,.98),rgba(1,8,14,.98));
+border:1px solid rgba(0,234,255,.25);
+box-shadow:0 0 80px rgba(0,180,255,.1),inset 0 0 50px rgba(0,140,255,.04);
+animation:loginIn .8s ease;
+}
+
+.auth-box:before,
+.auth-box:after{
+content:"";
+position:absolute;
+width:48px;
+height:48px;
+border-color:var(--cyan);
+border-style:solid;
+}
+
+.auth-box:before{
+top:10px;
+left:10px;
+border-width:2px 0 0 2px;
+}
+
+.auth-box:after{
+right:10px;
+bottom:10px;
+border-width:0 2px 2px 0;
+}
+
+.logo{
+text-align:center;
+font-family:"Orbitron";
+font-size:30px;
+font-weight:800;
+letter-spacing:8px;
+color:white;
+text-shadow:0 0 10px var(--cyan),0 0 30px rgba(0,234,255,.5);
+}
+
+.subtitle{
+margin:8px 0 30px;
+text-align:center;
+color:#55dff1;
+font-size:10px;
+letter-spacing:4px;
+}
+
+.auth-tabs{
+display:flex;
+margin-bottom:22px;
+border-bottom:1px solid rgba(0,234,255,.2);
+}
+
+.auth-tab{
+flex:1;
+padding:12px;
+color:#4e6973;
+background:transparent;
+border:0;
+font-family:"Orbitron";
+font-size:10px;
+letter-spacing:2px;
+cursor:pointer;
+}
+
+.auth-tab.active{
+color:var(--cyan);
+border-bottom:2px solid var(--cyan);
+text-shadow:0 0 10px var(--cyan);
+}
+
+.auth-input{
+width:100%;
+margin-bottom:13px;
+padding:14px;
+color:white;
+background:rgba(0,0,0,.35);
+border:1px solid #173744;
+outline:none;
+font-size:15px;
+}
+
+.auth-input:focus{
+border-color:var(--cyan);
+box-shadow:0 0 20px rgba(0,234,255,.1);
+}
+
+.auth-button{
+width:100%;
+margin-top:5px;
+padding:15px;
+color:var(--cyan);
+background:rgba(0,200,255,.07);
+border:1px solid var(--cyan);
+font-family:"Orbitron";
+font-size:10px;
+letter-spacing:3px;
+cursor:pointer;
+transition:.3s;
+}
+
+.auth-button:hover{
+color:#001018;
+background:var(--cyan);
+box-shadow:0 0 30px rgba(0,234,255,.5);
+}
+
+.auth-message{
+min-height:20px;
+margin-top:15px;
+text-align:center;
+color:var(--red);
+font-size:12px;
+letter-spacing:1px;
+}
+
+.app{
+width:100%;
+height:100%;
+display:flex;
+flex-direction:column;
+}
+
+.topbar{
+height:68px;
+flex-shrink:0;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 28px;
+background:rgba(1,8,14,.92);
+border-bottom:1px solid rgba(0,234,255,.2);
+}
+
+.brand{
+color:white;
+font-family:"Orbitron";
+font-size:21px;
+font-weight:800;
+letter-spacing:6px;
+text-shadow:0 0 15px var(--cyan);
+}
+
+.system-status{
+display:flex;
+align-items:center;
+gap:9px;
+color:#6ce7f8;
+font-size:11px;
+letter-spacing:2px;
+}
+
+.status-dot{
+width:8px;
+height:8px;
+border-radius:50%;
+background:var(--green);
+box-shadow:0 0 12px var(--green);
+animation:pulse 1.5s infinite;
+}
+
+.logout{
+padding:8px 15px;
+color:#607b84;
+background:transparent;
+border:1px solid #203e49;
+cursor:pointer;
+}
+
+.logout:hover{
+color:var(--red);
+border-color:var(--red);
+}
+
+.workspace{
+flex:1;
+min-height:0;
+display:grid;
+grid-template-columns:270px minmax(400px,1fr) 300px;
+gap:16px;
+padding:16px;
+}
+
+.panel{
+position:relative;
+overflow:hidden;
+background:linear-gradient(145deg,rgba(3,20,31,.82),rgba(1,9,15,.88));
+border:1px solid rgba(0,234,255,.22);
+}
+
+.panel-title{
+padding:15px;
+color:var(--cyan);
+border-bottom:1px solid rgba(0,234,255,.2);
+font-family:"Orbitron";
+font-size:10px;
+letter-spacing:2px;
+}
+
+.examples-content{
+height:calc(100% - 52px);
+padding:17px;
+overflow-y:auto;
+}
+
+.intro{
+margin-bottom:18px;
+color:#607b84;
+font-size:13px;
+line-height:1.5;
+}
+
+.example{
+margin-bottom:9px;
+padding:12px;
+background:rgba(0,180,255,.035);
+border-left:2px solid var(--cyan);
+}
+
+.example-label{
+margin-bottom:5px;
+color:#42616b;
+font-family:"Orbitron";
+font-size:8px;
+letter-spacing:2px;
+}
+
+.example-text{
+color:#b8eaf2;
+font-size:14px;
+}
+
+.voice-hint{
+position:absolute;
+left:17px;
+right:17px;
+bottom:17px;
+padding:13px;
+color:#55737d;
+background:rgba(0,5,10,.85);
+border:1px solid rgba(0,234,255,.12);
+font-size:12px;
+line-height:1.5;
+}
+
+.voice-hint strong{
+color:var(--cyan);
+}
+
+.core{
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.core-ring{
+position:relative;
+width:min(430px,48vw);
+height:min(430px,48vw);
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+border:1px solid rgba(0,234,255,.18);
+animation:rotate 25s linear infinite;
+}
+
+.core-ring:before{
+content:"";
+position:absolute;
+inset:20px;
+border-radius:50%;
+border:1px solid rgba(0,234,255,.28);
+border-left-color:transparent;
+border-right-color:transparent;
+animation:reverseRotate 9s linear infinite;
+}
+
+.core-ring:after{
+content:"";
+position:absolute;
+inset:48px;
+border-radius:50%;
+border:1px solid rgba(0,120,255,.4);
+border-top-color:transparent;
+border-bottom-color:transparent;
+animation:rotate 12s linear infinite;
+}
+
+.energy-ring{
+position:absolute;
+inset:8px;
+border-radius:50%;
+border:3px solid transparent;
+border-top-color:var(--cyan);
+border-bottom-color:var(--blue);
+filter:drop-shadow(0 0 10px var(--cyan));
+animation:rotate 5s linear infinite;
+}
+
+.energy-ring-two{
+position:absolute;
+inset:32px;
+border-radius:50%;
+border:2px solid transparent;
+border-left-color:#009cff;
+border-right-color:#00eaff;
+animation:reverseRotate 4s linear infinite;
+}
+
+.energy-ring-three{
+position:absolute;
+inset:68px;
+border-radius:50%;
+border:1px dashed rgba(0,234,255,.5);
+animation:rotate 18s linear infinite;
+}
+
+.core-light{
+width:145px;
+height:145px;
+z-index:5;
+border-radius:50%;
+background:radial-gradient(circle,white 0%,#c5fbff 5%,#28e2ff 13%,#008cff 28%,#00386c 50%,transparent 72%);
+box-shadow:0 0 30px #00eaff,0 0 70px rgba(0,130,255,.7),0 0 130px rgba(0,100,255,.25);
+animation:corePulse 2s ease-in-out infinite;
+}
+
+.voice-wave{
+position:absolute;
+width:330px;
+height:330px;
+border-radius:50%;
+pointer-events:none;
+}
+
+.voice-wave.active{
+border:1px solid var(--green);
+animation:voiceWave 1.2s infinite;
+}
+
+.core-status{
+position:absolute;
+bottom:125px;
+max-width:80%;
+text-align:center;
+color:#70e8f7;
+font-family:"Orbitron";
+font-size:10px;
+letter-spacing:2px;
+text-shadow:0 0 12px var(--cyan);
+z-index:10;
+}
+
+.core-status.listening{
+color:var(--green);
+text-shadow:0 0 15px var(--green);
+}
+
+.core-status.error{
+color:var(--red);
+text-shadow:0 0 15px var(--red);
+}
+
+.mic-button{
+position:absolute;
+bottom:48px;
+width:68px;
+height:68px;
+z-index:20;
+border-radius:50%;
+color:var(--cyan);
+background:rgba(0,180,255,.07);
+border:1px solid var(--cyan);
+box-shadow:0 0 20px rgba(0,234,255,.12),inset 0 0 15px rgba(0,234,255,.06);
+font-size:25px;
+cursor:pointer;
+transition:.3s;
+}
+
+.mic-button:hover{
+background:rgba(0,234,255,.16);
+box-shadow:0 0 30px rgba(0,234,255,.4);
+transform:scale(1.06);
+}
+
+.mic-button.listening{
+color:var(--green);
+border-color:var(--green);
+box-shadow:0 0 30px rgba(0,255,174,.5);
+animation:listening 1.1s infinite;
+}
+
+.right{
+display:flex;
+flex-direction:column;
+min-height:0;
+}
+
+.conversation{
+flex:1;
+overflow-y:auto;
+padding:14px;
+}
+
+.message{
+margin-bottom:12px;
+padding:11px 12px;
+background:rgba(0,180,255,.035);
+border-left:2px solid var(--cyan);
+animation:messageIn .3s ease;
+}
+
+.message.user{
+border-left-color:var(--green);
+}
+
+.message-name{
+margin-bottom:4px;
+color:var(--cyan);
+font-family:"Orbitron";
+font-size:8px;
+letter-spacing:2px;
+}
+
+.message.user .message-name{
+color:var(--green);
+}
+
+.message-text{
+color:#8baab3;
+font-size:13px;
+line-height:1.4;
+word-break:break-word;
+}
+
+.input-area{
+padding:12px;
+border-top:1px solid rgba(0,234,255,.2);
+}
+
+.text-command{
+width:100%;
+padding:13px;
+color:white;
+background:#020b11;
+border:1px solid #193b47;
+outline:none;
+font-size:14px;
+}
+
+.text-command:focus{
+border-color:var(--cyan);
+box-shadow:0 0 15px rgba(0,234,255,.08);
+}
+
+.input-note{
+margin-top:8px;
+color:#476570;
+font-size:9px;
+letter-spacing:1px;
+}
+
+::-webkit-scrollbar{
+width:5px;
+}
+
+::-webkit-scrollbar-track{
+background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+background:rgba(0,234,255,.22);
+}
+
+@keyframes loginIn{
+from{opacity:0;transform:translateY(30px) scale(.95)}
+to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes rotate{
+to{transform:rotate(360deg)}
+}
+
+@keyframes reverseRotate{
+to{transform:rotate(-360deg)}
+}
+
+@keyframes corePulse{
+50%{transform:scale(1.08);filter:brightness(1.3)}
+}
+
+@keyframes pulse{
+50%{opacity:.3}
+}
+
+@keyframes listening{
+50%{transform:scale(1.12)}
+}
+
+@keyframes voiceWave{
+0%{transform:scale(.7);opacity:.8}
+100%{transform:scale(1.5);opacity:0}
+}
+
+@keyframes messageIn{
+from{opacity:0;transform:translateX(12px)}
+to{opacity:1;transform:translateX(0)}
+}
+
+@media(max-width:1100px){
+.workspace{
+grid-template-columns:220px minmax(350px,1fr);
+}
+.right{
+display:none;
+}
+}
+
+@media(max-width:700px){
+.workspace{
+display:block;
+padding:8px;
+}
+.examples{
+display:none;
+}
+.core{
+height:calc(100vh - 84px);
+}
+.core-ring{
+width:300px;
+height:300px;
+}
+.core-light{
+width:105px;
+height:105px;
+}
+.system-status{
+display:none;
+}
+.brand{
+font-size:16px;
+letter-spacing:4px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="auth" id="auth">
+
+<div class="auth-box">
+
+<div class="logo">J.A.R.V.I.S.</div>
+
+<div class="subtitle">
+PERSONAL ARTIFICIAL INTELLIGENCE
+</div>
+
+<div class="auth-tabs">
+
+<button class="auth-tab active" id="loginTab">
+LOGIN
+</button>
+
+<button class="auth-tab" id="signupTab">
+SIGN UP
+</button>
+
+</div>
+
+<div id="loginForm">
+
+<input
+class="auth-input"
+id="loginUser"
+type="text"
+placeholder="Username or Email"
+>
+
+<input
+class="auth-input"
+id="loginPass"
+type="password"
+placeholder="Password"
+>
+
+<button
+class="auth-button"
+id="loginButton"
+>
+ACCESS J.A.R.V.I.S.
+</button>
+
+</div>
+
+<div id="signupForm" class="hidden">
+
+<input
+class="auth-input"
+id="signupUser"
+type="text"
+placeholder="Username"
+>
+
+<input
+class="auth-input"
+id="signupEmail"
+type="email"
+placeholder="Email Address"
+>
+
+<input
+class="auth-input"
+id="signupPass"
+type="password"
+placeholder="Password"
+>
+
+<input
+class="auth-input"
+id="signupConfirm"
+type="password"
+placeholder="Confirm Password"
+>
+
+<button
+class="auth-button"
+id="signupButton"
+>
+CREATE ACCOUNT
+</button>
+
+</div>
+
+<div class="auth-message" id="authMessage"></div>
+
+</div>
+
+</div>
+
+
+<div class="app hidden" id="app">
+
+<header class="topbar">
+
+<div class="brand">
+J.A.R.V.I.S.
+</div>
+
+<div class="system-status">
+
+<div class="status-dot"></div>
+
+VOICE SYSTEM ONLINE
+
+</div>
+
+<button class="logout" id="logoutButton">
+LOG OUT
+</button>
+
+</header>
+
+
+<main class="workspace">
+
+
+<section class="panel examples">
+
+<div class="panel-title">
+VOICE COMMAND GUIDE
+</div>
+
+<div class="examples-content">
+
+<div class="intro">
+Every website command opens a separate browser tab.
+Previous websites remain open.
+</div>
+
+<div class="example">
+<div class="example-label">SOCIAL</div>
+<div class="example-text">
+"Jarvis, open Instagram."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">SOCIAL</div>
+<div class="example-text">
+"Jarvis, open Facebook."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">MUSIC</div>
+<div class="example-text">
+"Jarvis, open Spotify."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">CHAT</div>
+<div class="example-text">
+"Jarvis, open Discord."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">VIDEO</div>
+<div class="example-text">
+"Jarvis, open YouTube."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">AI</div>
+<div class="example-text">
+"Jarvis, open ChatGPT."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">DEVELOPMENT</div>
+<div class="example-text">
+"Jarvis, open GitHub."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">SEARCH</div>
+<div class="example-text">
+"Jarvis, search for Java games."
+</div>
+</div>
+
+<div class="example">
+<div class="example-label">WEBSITE</div>
+<div class="example-text">
+"Jarvis, open example.com."
+</div>
+</div>
+
+</div>
+
+<div class="voice-hint">
+<strong>MULTI-TAB MODE</strong>
+<br>
+Each website command gets its own tab.
+</div>
+
+</section>
+
+
+<section class="panel core">
+
+<div class="core-ring">
+
+<div class="energy-ring"></div>
+<div class="energy-ring-two"></div>
+<div class="energy-ring-three"></div>
+
+<div
+class="voice-wave"
+id="voiceWave"
+></div>
+
+<div class="core-light"></div>
+
+</div>
+
+<div
+class="core-status"
+id="coreStatus"
+>
+VOICE MODE OFF
+</div>
+
+<button
+class="mic-button"
+id="micButton"
+>
+ð
+</button>
+
+</section>
+
+
+<section class="panel right">
+
+<div class="panel-title">
+CONVERSATION
+</div>
+
+<div
+class="conversation"
+id="conversation"
+>
+
+<div class="message">
+
+<div class="message-name">
+J.A.R.V.I.S.
+</div>
+
+<div class="message-text">
+Systems initialized. Voice interface standing by.
+</div>
+
+</div>
+
+</div>
+
+<div class="input-area">
+
+<input
+class="text-command"
+id="textCommand"
+type="text"
+placeholder="Type a command and press Enter..."
+>
+
+<div class="input-note">
+ENTER TO SEND â¢ MICROPHONE FOR VOICE
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+let currentUser=null;
+let recognition=null;
+let voiceMode=false;
+let recognitionRunning=false;
+let speaking=false;
+
+/*
+TAB POOL
+
+When the user clicks the microphone,
+several blank tabs are created immediately
+as part of that click.
+
+Later voice commands use one of those tabs.
+
+This avoids the popup blocker that can occur
+when window.open is called from a speech
+recognition callback.
+*/
+
+let commandTabs=[];
+let nextTabIndex=0;
+
+const TAB_POOL_SIZE=12;
+
+const auth=document.getElementById("auth");
+const app=document.getElementById("app");
+const loginTab=document.getElementById("loginTab");
+const signupTab=document.getElementById("signupTab");
+const loginForm=document.getElementById("loginForm");
+const signupForm=document.getElementById("signupForm");
+const authMessage=document.getElementById("authMessage");
+const coreStatus=document.getElementById("coreStatus");
+const micButton=document.getElementById("micButton");
+const voiceWave=document.getElementById("voiceWave");
+const conversation=document.getElementById("conversation");
+
+
+function getUsers(){
+
+return JSON.parse(
+localStorage.getItem("jarvis_users")||"{}"
+);
+
+}
+
+
+function saveUsers(users){
+
+localStorage.setItem(
+"jarvis_users",
+JSON.stringify(users)
+);
+
+}
+
+
+function showAuthMessage(message){
+
+authMessage.textContent=message;
+
+}
+
+
+loginTab.addEventListener("click",function(){
+
+loginTab.classList.add("active");
+signupTab.classList.remove("active");
+
+loginForm.classList.remove("hidden");
+signupForm.classList.add("hidden");
+
+showAuthMessage("");
+
+});
+
+
+signupTab.addEventListener("click",function(){
+
+signupTab.classList.add("active");
+loginTab.classList.remove("active");
+
+signupForm.classList.remove("hidden");
+loginForm.classList.add("hidden");
+
+showAuthMessage("");
+
+});
+
+
+document.getElementById("signupButton")
+.addEventListener("click",signup);
+
+
+function signup(){
+
+const username=document
+.getElementById("signupUser")
+.value.trim();
+
+const email=document
+.getElementById("signupEmail")
+.value.trim()
+.toLowerCase();
+
+const password=document
+.getElementById("signupPass")
+.value;
+
+const confirm=document
+.getElementById("signupConfirm")
+.value;
+
+if(!username||!email||!password||!confirm){
+
+showAuthMessage(
+"COMPLETE ALL FIELDS"
+);
+
+return;
+
+}
+
+if(password.length<6){
+
+showAuthMessage(
+"PASSWORD MUST CONTAIN AT LEAST 6 CHARACTERS"
+);
+
+return;
+
+}
+
+if(password!==confirm){
+
+showAuthMessage(
+"PASSWORDS DO NOT MATCH"
+);
+
+return;
+
+}
+
+const users=getUsers();
+
+if(users[username]){
+
+showAuthMessage(
+"USERNAME ALREADY EXISTS"
+);
+
+return;
+
+}
+
+users[username]={
+username:username,
+email:email,
+password:password
+};
+
+saveUsers(users);
+
+localStorage.setItem(
+"jarvis_session",
+username
+);
+
+currentUser=users[username];
+
+openApp();
+
+}
+
+
+document.getElementById("loginButton")
+.addEventListener("click",login);
+
+
+function login(){
+
+const identity=document
+.getElementById("loginUser")
+.value.trim();
+
+const password=document
+.getElementById("loginPass")
+.value;
+
+const users=getUsers();
+
+let found=null;
+
+for(const username in users){
+
+if(
+username.toLowerCase()===identity.toLowerCase()
+||
+users[username].email===identity.toLowerCase()
+){
+
+found=users[username];
+break;
+
+}
+
+}
+
+if(!found){
+
+showAuthMessage(
+"ACCOUNT NOT FOUND"
+);
+
+return;
+
+}
+
+if(found.password!==password){
+
+showAuthMessage(
+"INCORRECT PASSWORD"
+);
+
+return;
+
+}
+
+currentUser=found;
+
+localStorage.setItem(
+"jarvis_session",
+currentUser.username
+);
+
+openApp();
+
+}
+
+
+function openApp(){
+
+auth.classList.add("hidden");
+app.classList.remove("hidden");
+
+setTimeout(function(){
+
+speak(
+"Welcome back. J.A.R.V.I.S. is online and ready."
+);
+
+},500);
+
+}
+
+
+document.getElementById("logoutButton")
+.addEventListener("click",logout);
+
+
+function logout(){
+
+stopVoiceMode();
+
+closeCommandTabs();
+
+localStorage.removeItem(
+"jarvis_session"
+);
+
+currentUser=null;
+
+app.classList.add("hidden");
+auth.classList.remove("hidden");
+
+showAuthMessage(
+"SYSTEM LOCKED"
+);
+
+}
+
+
+/*
+CREATE MULTIPLE TABS
+
+This happens during the microphone
+button click.
+
+The browser therefore sees all the
+window.open calls as being caused
+by the user's click.
+*/
+
+function prepareCommandTabs(){
+
+closeCommandTabs();
+
+commandTabs=[];
+
+nextTabIndex=0;
+
+for(
+let i=0;
+i<TAB_POOL_SIZE;
+i++
+){
+
+const tab=window.open(
+"about:blank",
+"_blank"
+);
+
+if(!tab){
+
+break;
+
+}
+
+try{
+
+tab.document.title=
+"J.A.R.V.I.S. Command";
+
+tab.document.body.style.background=
+"#01070c";
+
+tab.document.body.style.color=
+"#00eaff";
+
+tab.document.body.style.fontFamily=
+"Arial";
+
+tab.document.body.innerHTML=
+"<div style='display:flex;align-items:center;justify-content:center;height:100vh;background:#01070c;color:#00eaff;font-family:Arial;font-size:20px;letter-spacing:4px'>J.A.R.V.I.S.</div>";
+
+}catch(error){
+
+console.log(error);
+
+}
+
+commandTabs.push(tab);
+
+}
+
+if(commandTabs.length===0){
+
+coreStatus.classList.add("error");
+
+coreStatus.textContent=
+"POPUPS BLOCKED";
+
+addMessage(
+"J.A.R.V.I.S.",
+"Chrome or Edge blocked the browser tabs. Allow popups for this page, then click the microphone again."
+);
+
+return false;
+
+}
+
+return true;
+
+}
+
+
+/*
+CLOSE THE TABS WE CREATED
+*/
+
+function closeCommandTabs(){
+
+for(const tab of commandTabs){
+
+try{
+
+if(tab&&!tab.closed){
+tab.close();
+}
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+commandTabs=[];
+
+nextTabIndex=0;
+
+}
+
+
+/*
+GET A NEW TAB FROM THE POOL
+*/
+
+function getNextCommandTab(){
+
+if(commandTabs.length===0){
+
+return null;
+
+}
+
+let checked=0;
+
+while(
+checked<commandTabs.length
+){
+
+const index=
+nextTabIndex%
+commandTabs.length;
+
+nextTabIndex++;
+
+checked++;
+
+const tab=
+commandTabs[index];
+
+if(
+tab&&
+!tab.closed
+){
+
+return tab;
+
+}
+
+}
+
+return null;
+
+}
+
+
+/*
+OPEN WEBSITE IN A NEW TAB
+*/
+
+function openWebsite(url,name){
+
+const tab=
+getNextCommandTab();
+
+if(!tab){
+
+speak(
+"I have no available command tab. Please click the microphone again."
+);
+
+return;
+
+}
+
+addMessage(
+"J.A.R.V.I.S.",
+"Opening "+name+" in a new tab."
+);
+
+try{
+
+tab.location.href=url;
+
+tab.focus();
+
+}catch(error){
+
+console.log(error);
+
+speak(
+"I could not navigate that tab."
+);
+
+}
+
+}
+
+
+/*
+VOICE BUTTON
+*/
+
+micButton.addEventListener(
+"click",
+toggleVoiceMode
+);
+
+
+function toggleVoiceMode(){
+
+if(voiceMode){
+
+stopVoiceMode();
+
+}else{
+
+startVoiceMode();
+
+}
+
+}
+
+
+function startVoiceMode(){
+
+const SpeechRecognition=
+window.SpeechRecognition||
+window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+
+coreStatus.classList.add("error");
+
+coreStatus.textContent=
+"VOICE NOT SUPPORTED";
+
+speak(
+"Voice recognition is not supported in this browser. Please use Chrome or Edge."
+);
+
+return;
+
+}
+
+
+/*
+IMPORTANT:
+
+Create all command tabs before
+starting speech recognition.
+*/
+
+const tabsReady=
+prepareCommandTabs();
+
+if(!tabsReady){
+
+return;
+
+}
+
+voiceMode=true;
+
+micButton.classList.add("listening");
+
+voiceWave.classList.add("active");
+
+coreStatus.classList.remove("error");
+
+coreStatus.classList.add("listening");
+
+coreStatus.textContent=
+"STARTING VOICE MODE";
+
+recognition=
+new SpeechRecognition();
+
+recognition.lang="en-US";
+
+recognition.continuous=true;
+
+recognition.interimResults=false;
+
+recognition.maxAlternatives=1;
+
+recognition.onstart=function(){
+
+recognitionRunning=true;
+
+coreStatus.textContent=
+"LISTENING...";
+
+};
+
+recognition.onresult=function(event){
+
+if(!voiceMode){
+return;
+}
+
+const result=
+event.results[
+event.results.length-1
+];
+
+if(!result||!result.isFinal){
+return;
+}
+
+const text=
+result[0]
+.transcript
+.trim();
+
+if(!text){
+return;
+}
+
+addMessage(
+"YOU",
+text,
+true
+);
+
+processCommand(text);
+
+};
+
+recognition.onerror=function(event){
+
+console.log(
+"Speech recognition:",
+event.error
+);
+
+if(
+event.error==="not-allowed"
+){
+
+voiceMode=false;
+recognitionRunning=false;
+
+micButton.classList.remove("listening");
+voiceWave.classList.remove("active");
+
+coreStatus.classList.remove("listening");
+coreStatus.classList.add("error");
+
+coreStatus.textContent=
+"MICROPHONE PERMISSION REQUIRED";
+
+return;
+
+}
+
+};
+
+recognition.onend=function(){
+
+recognitionRunning=false;
+
+if(
+voiceMode&&
+!speaking
+){
+
+setTimeout(
+restartRecognition,
+500
+);
+
+}
+
+};
+
+try{
+
+recognition.start();
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+
+function restartRecognition(){
+
+if(!voiceMode){
+return;
+}
+
+if(
+recognitionRunning||
+!recognition
+){
+
+return;
+
+}
+
+try{
+
+recognition.start();
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+
+function stopVoiceMode(){
+
+voiceMode=false;
+
+recognitionRunning=false;
+
+if(recognition){
+
+try{
+
+recognition.onend=null;
+recognition.stop();
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+recognition=null;
+
+if("speechSynthesis" in window){
+
+speechSynthesis.cancel();
+
+}
+
+speaking=false;
+
+micButton.classList.remove(
+"listening"
+);
+
+voiceWave.classList.remove(
+"active"
+);
+
+coreStatus.classList.remove(
+"listening"
+);
+
+coreStatus.textContent=
+"VOICE MODE OFF";
+
+}
+
+
+function addMessage(
+sender,
+text,
+isUser=false
+){
+
+const message=
+document.createElement("div");
+
+message.className=
+"message"+
+(isUser?" user":"");
+
+const name=
+document.createElement("div");
+
+name.className="message-name";
+
+name.textContent=sender;
+
+const body=
+document.createElement("div");
+
+body.className="message-text";
+
+body.textContent=text;
+
+message.appendChild(name);
+message.appendChild(body);
+
+conversation.appendChild(message);
+
+conversation.scrollTop=
+conversation.scrollHeight;
+
+}
+
+
+function speak(text){
+
+addMessage(
+"J.A.R.V.I.S.",
+text,
+false
+);
+
+if(!("speechSynthesis" in window)){
+return;
+}
+
+speechSynthesis.cancel();
+
+speaking=true;
+
+const utterance=
+new SpeechSynthesisUtterance(text);
+
+utterance.rate=.88;
+utterance.pitch=.72;
+utterance.volume=1;
+
+const voices=
+speechSynthesis.getVoices();
+
+const voice=
+voices.find(
+v=>/en-GB/i.test(v.lang)
+)
+||
+voices.find(
+v=>/British/i.test(v.name)
+)
+||
+voices.find(
+v=>/English/i.test(v.lang)
+);
+
+if(voice){
+utterance.voice=voice;
+}
+
+utterance.onend=function(){
+
+speaking=false;
+
+if(voiceMode){
+
+coreStatus.textContent=
+"LISTENING...";
+
+}
+
+};
+
+utterance.onerror=function(){
+
+speaking=false;
+
+};
+
+speechSynthesis.speak(
+utterance
+);
+
+}
+
+
+/*
+COMMAND PROCESSOR
+*/
+
+function processCommand(input){
+
+let command=
+input
+.toLowerCase()
+.trim();
+
+command=
+command.replace(
+/[.,!?]/g,
+""
+);
+
+command=
+command.replace(
+/^hey jarvis\s*/,
+""
+);
+
+command=
+command.replace(
+/^hello jarvis\s*/,
+""
+);
+
+command=
+command.replace(
+/^jarvis\s*/,
+""
+);
+
+
+/* SOCIAL */
+
+if(command.includes("open facebook")){
+
+openWebsite(
+"https://www.facebook.com",
+"Facebook"
+);
+
+return;
+
+}
+
+if(command.includes("open messenger")){
+
+openWebsite(
+"https://www.messenger.com",
+"Messenger"
+);
+
+return;
+
+}
+
+if(command.includes("open instagram")){
+
+openWebsite(
+"https://www.instagram.com",
+"Instagram"
+);
+
+return;
+
+}
+
+if(command.includes("open tiktok")){
+
+openWebsite(
+"https://www.tiktok.com",
+"TikTok"
+);
+
+return;
+
+}
+
+if(
+command.includes("open twitter")||
+command.includes("open x")
+){
+
+openWebsite(
+"https://x.com",
+"X"
+);
+
+return;
+
+}
+
+if(command.includes("open reddit")){
+
+openWebsite(
+"https://www.reddit.com",
+"Reddit"
+);
+
+return;
+
+}
+
+if(command.includes("open linkedin")){
+
+openWebsite(
+"https://www.linkedin.com",
+"LinkedIn"
+);
+
+return;
+
+}
+
+if(command.includes("open pinterest")){
+
+openWebsite(
+"https://www.pinterest.com",
+"Pinterest"
+);
+
+return;
+
+}
+
+
+/* MUSIC */
+
+if(command.includes("open spotify")){
+
+openWebsite(
+"https://open.spotify.com",
+"Spotify"
+);
+
+return;
+
+}
+
+
+/* VIDEO */
+
+if(command.includes("open youtube")){
+
+openWebsite(
+"https://www.youtube.com",
+"YouTube"
+);
+
+return;
+
+}
+
+if(command.includes("open netflix")){
+
+openWebsite(
+"https://www.netflix.com",
+"Netflix"
+);
+
+return;
+
+}
+
+if(command.includes("open twitch")){
+
+openWebsite(
+"https://www.twitch.tv",
+"Twitch"
+);
+
+return;
+
+}
+
+
+/* CHAT */
+
+if(command.includes("open discord")){
+
+openWebsite(
+"https://discord.com/app",
+"Discord"
+);
+
+return;
+
+}
+
+if(command.includes("open whatsapp")){
+
+openWebsite(
+"https://web.whatsapp.com",
+"WhatsApp"
+);
+
+return;
+
+}
+
+if(command.includes("open telegram")){
+
+openWebsite(
+"https://web.telegram.org",
+"Telegram"
+);
+
+return;
+
+}
+
+
+/* GOOGLE */
+
+if(command.includes("open google drive")){
+
+openWebsite(
+"https://drive.google.com",
+"Google Drive"
+);
+
+return;
+
+}
+
+if(command.includes("open google maps")){
+
+openWebsite(
+"https://maps.google.com",
+"Google Maps"
+);
+
+return;
+
+}
+
+if(command.includes("open google docs")){
+
+openWebsite(
+"https://docs.google.com",
+"Google Docs"
+);
+
+return;
+
+}
+
+if(command.includes("open gmail")){
+
+openWebsite(
+"https://mail.google.com",
+"Gmail"
+);
+
+return;
+
+}
+
+if(command==="open google"){
+
+openWebsite(
+"https://www.google.com",
+"Google"
+);
+
+return;
+
+}
+
+
+/* DEVELOPMENT */
+
+if(command.includes("open github")){
+
+openWebsite(
+"https://github.com",
+"GitHub"
+);
+
+return;
+
+}
+
+if(command.includes("open gitlab")){
+
+openWebsite(
+"https://gitlab.com",
+"GitLab"
+);
+
+return;
+
+}
+
+if(
+command.includes("open stack overflow")||
+command.includes("open stackoverflow")
+){
+
+openWebsite(
+"https://stackoverflow.com",
+"Stack Overflow"
+);
+
+return;
+
+}
+
+if(command.includes("open codepen")){
+
+openWebsite(
+"https://codepen.io",
+"CodePen"
+);
+
+return;
+
+}
+
+if(command.includes("open replit")){
+
+openWebsite(
+"https://replit.com",
+"Replit"
+);
+
+return;
+
+}
+
+
+/* AI */
+
+if(command.includes("open chatgpt")){
+
+openWebsite(
+"https://chatgpt.com",
+"ChatGPT"
+);
+
+return;
+
+}
+
+if(command.includes("open claude")){
+
+openWebsite(
+"https://claude.ai",
+"Claude"
+);
+
+return;
+
+}
+
+if(command.includes("open gemini")){
+
+openWebsite(
+"https://gemini.google.com",
+"Gemini"
+);
+
+return;
+
+}
+
+if(command.includes("open perplexity")){
+
+openWebsite(
+"https://www.perplexity.ai",
+"Perplexity"
+);
+
+return;
+
+}
+
+
+/* DESIGN */
+
+if(command.includes("open canva")){
+
+openWebsite(
+"https://www.canva.com",
+"Canva"
+);
+
+return;
+
+}
+
+if(command.includes("open figma")){
+
+openWebsite(
+"https://www.figma.com",
+"Figma"
+);
+
+return;
+
+}
+
+if(command.includes("open notion")){
+
+openWebsite(
+"https://www.notion.so",
+"Notion"
+);
+
+return;
+
+}
+
+
+/* SHOPPING */
+
+if(command.includes("open amazon")){
+
+openWebsite(
+"https://www.amazon.com",
+"Amazon"
+);
+
+return;
+
+}
+
+if(command.includes("open ebay")){
+
+openWebsite(
+"https://www.ebay.com",
+"eBay"
+);
+
+return;
+
+}
+
+
+/* OTHER */
+
+if(command.includes("open wikipedia")){
+
+openWebsite(
+"https://www.wikipedia.org",
+"Wikipedia"
+);
+
+return;
+
+}
+
+if(command.includes("open nasa")){
+
+openWebsite(
+"https://www.nasa.gov",
+"NASA"
+);
+
+return;
+
+}
+
+
+/* SEARCH */
+
+if(command.startsWith("search for ")){
+
+const query=
+command
+.replace("search for ","")
+.trim();
+
+if(!query){
+
+speak(
+"What would you like me to search for?"
+);
+
+return;
+
+}
+
+openWebsite(
+"https://www.google.com/search?q="+
+encodeURIComponent(query),
+"Google search"
+);
+
+return;
+
+}
+
+
+/* CUSTOM WEBSITE */
+
+if(command.startsWith("open website ")){
+
+let site=
+command
+.replace("open website ","")
+.trim()
+.replace(/\s+/g,"");
+
+if(!site.includes(".")){
+
+speak(
+"Please give me a valid website address."
+);
+
+return;
+
+}
+
+if(
+!site.startsWith("http://")&&
+!site.startsWith("https://")
+){
+
+site="https://"+site;
+
+}
+
+openWebsite(
+site,
+site
+);
+
+return;
+
+}
+
+
+/* CUSTOM DOMAIN */
+
+if(command.startsWith("open ")){
+
+let site=
+command
+.replace("open ","")
+.trim()
+.replace(/\s+/g,"");
+
+if(site.includes(".")){
+
+if(
+!site.startsWith("http://")&&
+!site.startsWith("https://")
+){
+
+site="https://"+site;
+
+}
+
+openWebsite(
+site,
+site
+);
+
+return;
+
+}
+
+}
+
+
+/* BASIC JARVIS */
+
+if(
+command==="hello"||
+command==="hi"
+){
+
+speak(
+"Hello. How may I assist you?"
+);
+
+return;
+
+}
+
+if(command.includes("who are you")){
+
+speak(
+"I am J.A.R.V.I.S., your personal artificial intelligence."
+);
+
+return;
+
+}
+
+if(command.includes("how are you")){
+
+speak(
+"All systems are operating normally."
+);
+
+return;
+
+}
+
+if(
+command.includes("what time")||
+command==="time"
+){
+
+speak(
+"The current time is "+
+new Date().toLocaleTimeString()
+);
+
+return;
+
+}
+
+if(
+command.includes("what date")||
+command==="date"
+){
+
+speak(
+"Today is "+
+new Date().toLocaleDateString(
+undefined,
+{
+weekday:"long",
+year:"numeric",
+month:"long",
+day:"numeric"
+}
+)
+);
+
+return;
+
+}
+
+if(
+command.includes("stop listening")||
+command.includes("stop voice")
+){
+
+stopVoiceMode();
+
+return;
+
+}
+
+speak(
+"I heard you, but I do not have an action configured for that command yet."
+);
+
+}
+
+
+/* TEXT INPUT */
+
+document.getElementById("textCommand")
+.addEventListener(
+"keydown",
+function(event){
+
+if(event.key!=="Enter"){
+return;
+}
+
+const command=
+this.value.trim();
+
+if(!command){
+return;
+}
+
+this.value="";
+
+addMessage(
+"YOU",
+command,
+true
+);
+
+processCommand(command);
+
+}
+);
+
+
+/* AUTO LOGIN */
+
+window.addEventListener(
+"load",
+function(){
+
+const session=
+localStorage.getItem(
+"jarvis_session"
+);
+
+if(!session){
+return;
+}
+
+const users=getUsers();
+
+if(!users[session]){
+return;
+}
+
+currentUser=users[session];
+
+openApp();
+
+}
+);
+
+</script>
+
+</body>
+</html>
